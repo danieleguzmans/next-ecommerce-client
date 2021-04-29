@@ -1,8 +1,9 @@
 import React,{useState} from "react";
 import {Form, Button} from "semantic-ui-react";
-import {Formik, useFormik} from "formik";
+import {useFormik} from "formik";
 import * as Yup from "yup";
 import {toast} from "react-toastify";
+import useAuth from "../../../hooks/useAuth";
 import {loginApi} from "../../../api/user";
 
 export default function LoginForm(props) {
@@ -11,6 +12,8 @@ export default function LoginForm(props) {
 
     const [loading, setLoading] = useState(false);
 
+    const {login} = useAuth();
+  
     const formik = useFormik({
         initialValues: initialValues(),
         validationSchema: Yup.object(validationSchema()),
@@ -18,6 +21,7 @@ export default function LoginForm(props) {
         setLoading(true);
         const response = await loginApi(formData);
         if (response?.jwt) {
+            login(response.jwt);
             toast.success("Login Correcto");
             onCloseModal();
         } else {
