@@ -1,15 +1,29 @@
-import {useState} from "react";
+import React,{useState,useEffect} from "react";
 import {Container, Menu, Grid, Icon, Label} from "semantic-ui-react"
 import Link from "next/link";
 import BasicModal from "../../Modal/BasicModal"
 import Auth from "../../Auth"
+import useAuth from "../../../hooks/useAuth";
+import {getMeApi} from "../../../api/user";
 
 export default function MenuWeb() {
     const [showModal, setShowModal] = useState(false);
     const [titleModal, setTitleModal] = useState("Iniciar Sesión");
-    const onShowModal = () => setShowModal(true);
+    const [user, setUser] = useState(undefined);
+    const {auth,logout} = useAuth();
 
+    useEffect(() => {
+        (async () => {
+            const response = await getMeApi(logout);
+            setUser(response);
+            console.log(response);
+
+        })();
+    }, []);
+
+    const onShowModal = () => setShowModal(true);
     const onCloseModal = () => setShowModal(false);
+
 
     return (
         <div className="menu">
@@ -19,7 +33,9 @@ export default function MenuWeb() {
                         <MenuPlatform/>
                     </Grid.Column>
                     <Grid.Column className="menu__right" width={10}>
-                        <MenuOption onShowModal={onShowModal}/>
+                        {auth ? (<button onClick={logout}>Cerrar Sesión</button>
+                        ) : (<MenuOption onShowModal={onShowModal}/>
+                        )}
                     </Grid.Column>
                 </Grid>
             </Container>
